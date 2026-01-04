@@ -172,6 +172,27 @@ const todoDelete = async (req,res) => {
     }
     
 }
+
+const deleteUser = async (req,res) => {
+    const {userId} = req.user;
+    const {id} = req.params;
+    try {
+    const adminUser = await User.findById(userId)
+    if(adminUser.role !== "admin"){
+        return res.status(404).json({message: "Access denied"});
+    }
+    const userDelete = await User.findByIdAndDelete(id);
+    if(!userDelete){
+        return res.status(400).json({message: "User not found"});
+    }
+    return res.status(200).json({message: "User deleted successfully!", userDelete});
+    } catch (error) {
+        console.error("Error deleting user",error)
+        return res.status(500).json({ message: " Internal Server error" });
+    }
+}
+
+
 module.exports = {
     signup,
     login,
@@ -180,5 +201,6 @@ module.exports = {
     todoById,
     todoSearch,
     todoUpdate,
-    todoDelete
+    todoDelete,
+    deleteUser
 };
